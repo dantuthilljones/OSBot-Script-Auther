@@ -1,0 +1,12 @@
+{
+  "manifest_version": 2,
+  "name": "OSBot Auther",
+  "version": "0.1",
+  "content_scripts": [ {
+    "matches": ["https://osbot.org/forum/topic/*"],
+    "js": ["jquery-3.2.1.min.js", "auther.js"]
+  }],
+  "browser_action": {
+    "default_icon": "icon.png"
+  }
+}
