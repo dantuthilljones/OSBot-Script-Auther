@@ -13,28 +13,41 @@ var regex = /\/([0-9]+)-/;
 run();
 
 function run() {
-  //get all the nodes that contain usernames in a forum thread
-  var names = $('strong[itemprop=name]');
+  //first scrape data from the scripter auth page
+  $.ajax({
+    type: 'GET',
+    url: 'https://osbot.org/mvc/scripters/auth',
+    error: function() {
+      console.log("OSBot Script Auther could not access the auth page")
+    },
+  }).done(function(data) {
+    //parse the data
+    var authData = parseAuthData(data);
+    addDropdowns(authData);
+  });
+}
 
-  //loop through every username
-  for(var i = 0; i < names.length; i++) {
-    console.log('i=' + i);
+function addDropdowns(authData) {
+  //get all comment elements
+  var comments = $('article[itemtype="http://schema.org/Comment"]');
+
+  //loop through every comment
+  for(var i = 0; i < comments.length; i++) {
 
     //convert the node to a jQuery object
-    var nameNode = $(names[i]);
+    var comment = $(comments[i]);
 
     //get the URL of the user's profile
-    var url = nameNode.children().first().attr('href');
+    var url = comment.find('strong[itemprop="name"]').children().first().attr('href');
 
     //use the regex from earlier to get the userID
     var userID = regex.exec(url)[1];
 
     //generate the HTML for the select menu
-    var selectHTML = generateSelectHTML(userID);
-    console.log(selectHTML);
+    var selectHTML = generateSelectHTML(userID, authData);
 
-    //insert the select dropdown after the username
-    nameNode.after(selectHTML);
+    //insert the select dropdown in the comment action bar
+    comment.find('.ipsComment_controls').children().last().after(selectHTML);
   }
 
   //add change listeners to the menus
@@ -64,7 +77,7 @@ function run() {
           authDuration: scriptDurations[index]
         },
         success: function() {
-          window.alert("Added Auth!");
+          location.reload();
         },
         error: function() {
           window.alert("Auth Failed :(");
@@ -74,11 +87,73 @@ function run() {
   });
 }
 
-function generateSelectHTML(userID) {
-  var html = '<select auth-userID=' + userID + '><option>Auth</option>';
+function generateSelectHTML(userID, data) {
+  var html = '<select style="height:30px; background-color:rgb(100,100,100); border:1px solid rgba(255,255,255,0.1);'
+    + 'padding-top: 5px; color: #dddddd; " auth-userID=' + userID + '><option>Auth</option>';
+
   for(var i = 0; i < authNames.length; i++) {
-    html += '<option value="' + i + '">' + authNames[i] + '</option>';
+    if(!data.hasAuth(userID, scriptIDs[i])) {
+      html += '<option value="' + i + '">' + authNames[i] + '</option>';
+    } else if(data.authExpired(userID, scriptIDs[i])) {
+      html += '<option style="background-color:orange" value="' + i + '">' + authNames[i] + '</option>';
+    } else {
+      html += '<option style="background-color:green" value="' + i + '">' + authNames[i] + '</option>';
+    }
   }
   html +='</select>';
   return html;
+}
+
+function parseAuthData(raw) {
+  var auths = [];
+
+  //get the table of auths from the auth page HTML
+  var table = $(raw).eq(13);
+
+  //get the rows of the table
+  var rows = table.find('tr');
+
+  //loop through each row
+  rows.each(function(index) {
+
+    //if the row isn't the header
+    if(index != 0) {
+      var row = $(this);
+
+      var children = row.children();
+      var scriptID = children.first().text();
+      var userID = children.eq(2).text();
+
+      //detect if the auth has expired by the background colour attribute
+      var expired = false;
+      if(row.attr('bgcolor')) {
+        expired = true;
+      }
+
+      //add the data from this row to auths
+      auths.push([scriptID, userID, expired]);
+    }
+  });
+
+  //returns true if the user has the script authed even if it is expired
+  auths.hasAuth = function(userID, scriptID) {
+    for(var i = 0; i < auths.length; i++) {
+      if(auths[i][0] == scriptID && auths[i][1] == userID) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  //returns true if the user has the script and it has expired
+  auths.authExpired = function(userID, scriptID) {
+    for(var i = 0; i < auths.length; i++) {
+      if(auths[i][0] == scriptID && auths[i][1] == userID && auths[i][2]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  return auths;
 }
