@@ -8,13 +8,12 @@ This tool adds a drop down menu at the bottom of a comment in all OSBot threads 
 ### Installation:
 1. Download the zip from github
 2. Extract it somewhere permanent
-3. Open up the file "auther.js" in a text editor
-4. Set up the different auth options by editing the arrays at the top of the file
-5. Save the file
-6. visit the URL "chrome://extensions/" in chrome
-7. Click "Developer mode" in the top right corner
-8. Click "Load unpacked extension" in the top left corner
-9. Select the folder you extracted the files
+3. visit the URL "chrome://extensions/" in chrome
+4. Click "Developer mode" in the top right corner
+5. Click "Load unpacked extension" in the top left corner
+6. Select the folder you extracted the files
+7. Open the web interface by right clicking on the code icon in the top right corner of chrome
+8. Fill in the settings for the different auth types you want
  
 ### Menu Colours:
 * The menu option will appear green if the user has an active auth for that script
