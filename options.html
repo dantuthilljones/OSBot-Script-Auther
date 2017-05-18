@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OSBot Auther Settings</title>
+  <link rel="shortcut icon" href="icon.png" type="image/x-icon">
+  <link rel="icon" href="icon.png" type="image/x-icon">
+  <link rel="stylesheet" type="text/css" href="Semantic-UI/dist/semantic.min.css">
+  <script src="jquery-3.2.1.min.js"></script>
+  <script src="Semantic-UI/dist/semantic.min.js"></script>
+  <script src="options.js"></script>
+</head>
+<body>
+  <div class="ui container" style="margin-top:100px;">
+    <div class="ui segment">
+      <div class="ui equal width form">
+        <div class="fields">
+          <div class="field">
+            <input id="authName" type="text" placeholder="Auth Name">
+          </div>
+          <div class="field">
+            <input id="scriptID" type="number" placeholder="Script ID">
+          </div>
+          <div class="field">
+            <input id="duration" type="number" placeholder="Duration">
+          </div>
+          <div class="field">
+            <button id="addAuth" class="ui inverted green fluid icon button">
+              <i class="add icon"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <table class="ui celled table">
+        <thead>
+          <tr>
+            <th>Auth Name</th>
+            <th>Script ID</th>
+            <th>Duration</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

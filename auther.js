@@ -1,18 +1,19 @@
-//define your auths here
-var authNames = ['MTA 48', 'MTA 72'];//the names of each auth type
-var scriptIDs = [473, 473];//the script ID of each auth type
-var scriptDurations = [48, 72];//the duration of each auth
-
 //This regex selects a sequence of numbers between a '/' and a '-'
 //It will select the user's ID from the user's url
 //e.g. for the string 'https://osbot.org/forum/profile/655-diclonius/'
 //it will select '655'
 var regex = /\/([0-9]+)-/;
 
-//run the extension
-run();
+//load the list of auths from storage
+chrome.storage.sync.get({
+  auths: []
+}, function(data) {
 
-function run() {
+  //run the extension
+  run(data.auths);
+});
+
+function run(auths) {
   //first scrape data from the scripter auth page
   $.ajax({
     type: 'GET',
@@ -20,14 +21,14 @@ function run() {
     error: function() {
       console.log("OSBot Script Auther could not access the auth page")
     },
-  }).done(function(data) {
+  }).done(function(authPageHTML) {
     //parse the data
-    var authData = parseAuthData(data);
-    addDropdowns(authData);
+    var authData = parseAuthData(authPageHTML);
+    addDropdowns(authData, auths);
   });
 }
 
-function addDropdowns(authData) {
+function addDropdowns(authData, auths) {
   //get all comment elements
   var comments = $('article[itemtype="http://schema.org/Comment"]');
 
@@ -44,7 +45,7 @@ function addDropdowns(authData) {
     var userID = regex.exec(url)[1];
 
     //generate the HTML for the select menu
-    var selectHTML = generateSelectHTML(userID, authData);
+    var selectHTML = generateSelectHTML(userID, authData, auths);
 
     //insert the select dropdown in the comment action bar
     comment.find('.ipsComment_controls').children().last().after(selectHTML);
@@ -87,17 +88,18 @@ function addDropdowns(authData) {
   });
 }
 
-function generateSelectHTML(userID, data) {
+function generateSelectHTML(userID, authData, auths) {
   var html = '<select style="height:30px; background-color:rgb(100,100,100); border:1px solid rgba(255,255,255,0.1);'
     + 'padding-top: 5px; color: #dddddd; " auth-userID=' + userID + '><option>Auth</option>';
 
-  for(var i = 0; i < authNames.length; i++) {
-    if(!data.hasAuth(userID, scriptIDs[i])) {
-      html += '<option value="' + i + '">' + authNames[i] + '</option>';
-    } else if(data.authExpired(userID, scriptIDs[i])) {
-      html += '<option style="background-color:orange" value="' + i + '">' + authNames[i] + '</option>';
+  for(var i = 0; i < auths.length; i++) {
+    var auth = auths[i];
+    if(!authData.hasAuth(userID, auth.scriptID)) {
+      html += '<option value="' + i + '">' + auth.name + '</option>';
+    } else if(authData.authExpired(userID, auth.scriptID)) {
+      html += '<option style="background-color:orange" value="' + i + '">' + auth.name + '</option>';
     } else {
-      html += '<option style="background-color:green" value="' + i + '">' + authNames[i] + '</option>';
+      html += '<option style="background-color:green" value="' + i + '">' + auth.name + '</option>';
     }
   }
   html +='</select>';
