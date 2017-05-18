@@ -6,7 +6,7 @@ This tool adds a drop down menu at the bottom of a comment in all OSBot threads 
 ![Example](http://i.imgur.com/39JzCEk.png "Example")
 
 Auth types can be added via a web interface:
-![Web Interface](http://i.imgur.com/kFe0Vym.png "Web Interface")
+![Web Interface](http://i.imgur.com/UbSceh2.png "Web Interface")
 
 ### Usage:
 1. Download the tool at: https://chrome.google.com/webstore/detail/osbot-auther/oleaocbomlohpbfocjkimaoipfmicpdm
