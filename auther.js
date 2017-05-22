@@ -66,6 +66,7 @@ function addDropdowns(authData, auths) {
 
       //index of the auth
       var index = parseInt(val);
+      var auth = auths[index];
 
       //send the auth request to OSBot
       $.ajax({
@@ -74,8 +75,8 @@ function addDropdowns(authData, auths) {
         data: {
           task: 'addauth',
           memberID: userID,
-          scriptID: scriptIDs[index],
-          authDuration: scriptDurations[index]
+          scriptID: auth.scriptID,
+          authDuration: auth.duration
         },
         success: function() {
           location.reload();
