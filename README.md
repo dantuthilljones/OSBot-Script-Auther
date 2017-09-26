@@ -11,7 +11,7 @@ Auth types can be added via a web interface:
 ![Web Interface](http://i.imgur.com/UbSceh2.png "Web Interface")
 
 ### Usage:
-1. Download the tool at: https://chrome.google.com/webstore/detail/osbot-auther/oleaocbomlohpbfocjkimaoipfmicpdm
+1. Download the tool on the [chrome web store](https://chrome.google.com/webstore/detail/osbot-auther/oleaocbomlohpbfocjkimaoipfmicpdm)
 2. Open the settings interface by selecting the options menu on the tools icon
 
 ### Menu Colours:
