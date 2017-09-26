@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
   "name": "OSBot Auther",
-  "version": "0.4",
+  "version": "0.5",
   "content_scripts": [ {
-    "matches": ["https://osbot.org/forum/topic/*"],
+    "matches": ["https://osbot.org/forum/topic/*", "https://osbot.org/forum/profile/*"],
     "js": ["jquery-3.2.1.min.js", "auther.js"]
   }],
   "options_page": "options.html",

@@ -29,34 +29,46 @@ function run(auths) {
 }
 
 function addDropdowns(authData, auths) {
-  //get all comment elements
-  var comments = $('article[itemtype="http://schema.org/Comment"]');
 
-  //loop through every comment
-  for(var i = 0; i < comments.length; i++) {
-
-    //convert the node to a jQuery object
-    var comment = $(comments[i]);
-
-    //get the URL of the user's profile
-    var url = comment.find('strong[itemprop="name"]').children().first().attr('href');
-
-    //use the regex from earlier to get the userID
-    var userID = regex.exec(url)[1];
+  //profile page
+  if(window.location.pathname.indexOf("/forum/profile/") != -1) {
+    //get the user ID from the URL
+    var userID = regex.exec(window.location.pathname)[1];
 
     //generate the HTML for the select menu
-    var selectHTML = generateSelectHTML(userID, authData, auths);
+    var selectElement = generateSelectElement(userID, authData, auths);
 
-    //insert the select dropdown in the comment action bar
-    comment.find('.ipsComment_controls').children().last().after(selectHTML);
+    //add drop down to the page
+    $('#elProfileStats > ul').append(selectElement);
+
+  } else {//thread page so add drop down to comment
+    //get all comment elements
+    var comments = $('article.ipsComment');
+
+    //add drop downs to each comment action bar
+    comments.each(function() {
+      var comment = $(this);
+
+      //get the URL of the user's profile
+      var url = comment.find('strong[itemprop="name"]').children().first().attr('href');
+
+      //use the regex from earlier to get the userID
+      var userID = regex.exec($(this).find(".cAuthorPane_author a:first").attr('href'))[1];
+
+      //generate the HTML for the select menu
+      var selectElement = generateSelectElement(userID, authData, auths);
+
+      //add the drop down to the comment action bar
+      comment.find('.ipsComment_controls').append(selectElement);
+    });
   }
 
-  //add change listeners to the menus
-  $('[auth-userID]').change(function() {
+  //add change listeners to drop downs
+  $('[data-userid]').change(function() {
     var select = $(this);
 
     //get the user ID
-    var userID = select.attr('auth-userID');
+    var userID = select.attr('data-userID');
 
     //get the selected value
     var val = select.find('option:selected').val();
@@ -89,22 +101,36 @@ function addDropdowns(authData, auths) {
   });
 }
 
-function generateSelectHTML(userID, authData, auths) {
-  var html = '<select style="height:30px; background-color:rgb(100,100,100); border:1px solid rgba(255,255,255,0.1);'
-    + 'padding-top: 5px; color: #dddddd; " auth-userID=' + userID + '><option>Auth</option>';
+function generateSelectElement(userID, authData, auths) {
+  //create the select element
+  var select = $('<select>')
+		.attr("data-userid", userID)
+		.css({
+			"height": "28px",
+			"border": "1px solid rgba(255,255,255,0.06)",
+			"padding": "0 23px 0 8px",
+			"font-weight": "bold",
+			"background-color": "rgb(66, 66, 66)",
+      "color": "rgb(221, 221, 221)",
+      "font-size": "12px",
+      "background-image": "url(https://osbot.org/forum/uploads/set_resources_12/84c1e40ea0e759e3f1505eb1788ddf3c_select_dropdown.png"
+	});
 
+  //add the title option
+  select.append($('<option>').text("Auth"));
+
+  //add an option node for each auth
   for(var i = 0; i < auths.length; i++) {
     var auth = auths[i];
     if(!authData.hasAuth(userID, auth.scriptID)) {
-      html += '<option value="' + i + '">' + auth.name + '</option>';
+      select.append($('<option>').val(i).text(auth.name));
     } else if(authData.authExpired(userID, auth.scriptID)) {
-      html += '<option style="background-color:orange" value="' + i + '">' + auth.name + '</option>';
+      select.append($('<option>').val(i).text(auth.name).css({'background-color': 'orange'}));
     } else {
-      html += '<option style="background-color:green" value="' + i + '">' + auth.name + '</option>';
+      select.append($('<option>').val(i).text(auth.name).css({'background-color': 'green'}));
     }
   }
-  html +='</select>';
-  return html;
+  return select;
 }
 
 function parseAuthData(raw) {
@@ -122,26 +148,21 @@ function parseAuthData(raw) {
     //if the row isn't the header
     if(index != 0) {
       var row = $(this);
-
       var children = row.children();
-      var scriptID = children.first().text();
-      var userID = children.eq(2).text();
-
-      //detect if the auth has expired by the background colour attribute
-      var expired = false;
-      if(row.attr('bgcolor')) {
-        expired = true;
-      }
 
       //add the data from this row to auths
-      auths.push([scriptID, userID, expired]);
+      auths.push({
+        scriptID: children.eq(0).text(),
+        userID: children.eq(2).text(),
+        expired: !!row.attr('bgcolor')//detect if the auth has expired by the background colour attribute
+      });
     }
   });
 
   //returns true if the user has the script authed even if it is expired
   auths.hasAuth = function(userID, scriptID) {
     for(var i = 0; i < auths.length; i++) {
-      if(auths[i][0] == scriptID && auths[i][1] == userID) {
+      if(auths[i].scriptID == scriptID && auths[i].userID == userID) {
         return true;
       }
     }
@@ -151,12 +172,11 @@ function parseAuthData(raw) {
   //returns true if the user has the script and it has expired
   auths.authExpired = function(userID, scriptID) {
     for(var i = 0; i < auths.length; i++) {
-      if(auths[i][0] == scriptID && auths[i][1] == userID && auths[i][2]) {
+      if(auths[i].scriptID == scriptID && auths[i].userID == userID && auths[i].expired) {
         return true;
       }
     }
     return false;
   }
-
   return auths;
 }
