@@ -3,7 +3,9 @@ OSBot Script Auther is a tool which adds a simpler way for scripter writers to g
 This tool is made by [Diclonius](https://osbot.org/forum/profile/655-diclonius/)
 
 This tool adds a drop down menu at the bottom of a comment in all OSBot threads like this:
-![Example](http://i.imgur.com/39JzCEk.png "Example")
+![Example1](http://i.imgur.com/39JzCEk.png "Example 1")
+and on all profile pages like this:
+![Example2](https://i.imgur.com/BzFmNMi.png "Example 2")
 
 Auth types can be added via a web interface:
 ![Web Interface](http://i.imgur.com/UbSceh2.png "Web Interface")
@@ -19,3 +21,6 @@ Auth types can be added via a web interface:
 
 ### To Do:
 * Add a summary interface to the OSBot homepage
+
+### Credits:
+* [Project](https://osbot.org/forum/profile/847-project/) for updated selectors and some neater code snippets taken from his [auther](https://osbot.org/forum/topic/129784-updated-script-trial-auther/)
